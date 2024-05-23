@@ -110,10 +110,30 @@
             cursor: pointer;
             font-size: 1.2em;
             transition: background-color 0.3s;
+            position: relative; /* Added for positioning the loader */
         }
 
         .apply-button:hover {
             background-color: #23272b;
+        }
+
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .popup {
@@ -185,7 +205,10 @@
                     <label for="cpr">CPR Number</label>
                     <input type="text" id="cpr" name="cpr">
                 </div>
-                <button type="submit" class="apply-button">Apply Now</button>
+                <button type="submit" class="apply-button" id="applyButton">
+                    <span id="applyButtonText">Apply Now</span>
+                    <div class="loader" id="loader"></div>
+                </button>
             </form>
         </section>
     </div>
@@ -195,6 +218,11 @@
     <script>
         document.getElementById('jobApplicationForm').addEventListener('submit', function(event) {
             event.preventDefault();
+
+            // Show loader
+            document.getElementById('applyButtonText').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+
             const formData = {
                 name: document.getElementById('name').value,
                 phone: document.getElementById('phone').value,
@@ -208,7 +236,6 @@
                 },
                 body: JSON.stringify(formData)
             })
-
             .then(response => {
                 if (response.ok) {
                     document.getElementById('successPopup').style.display = 'block';
@@ -219,7 +246,12 @@
                     alert('There was an error sending your application. Please try again.');
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.error('Error:', error))
+            .finally(() => {
+                // Hide loader
+                document.getElementById('applyButtonText').style.display = 'block';
+                document.getElementById('loader').style.display = 'none';
+            });
         });
     </script>
 </body>
